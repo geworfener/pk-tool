@@ -31,6 +31,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         self.table_widget.cellChanged.connect(lambda: self.write_file(savefile=True))
         self.console.returnPressed.connect(self.execute_console)
         self.action_new.triggered.connect(lambda: self.open_file(self.files_combobox.currentIndex(), new=True))
+        self.action_newSortName.triggered.connect(lambda: self.open_file(self.files_combobox.currentIndex(), new=True, sortName=True))
         self.action_undo.triggered.connect(self.history_undo)
         self.action_redo.triggered.connect(self.history_redo)
         self.action_add_student.triggered.connect(self.add_row)
@@ -99,7 +100,7 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
         if not student:
             self.write_lock = False
 
-    def open_file(self, index, new=False):
+    def open_file(self, index, new=False, sortName=False):
         if self.history_index != None and self.history_index != len(self.history_files) - 1:
             self.write_file(savefile=True)
 
@@ -123,8 +124,12 @@ class PkToolMainWindow(QMainWindow, Ui_MainWindow):
 
         self.checked_list = []
 
-        for student in sorted(students, key=lambda s: s.matrikelnr):
-            self.add_row(student)
+        if sortName:
+            for student in sorted(students, key=lambda s: s.name):
+                self.add_row(student)
+        else:
+            for student in sorted(students, key=lambda s: s.matrikelnr):
+                self.add_row(student)
 
         self.get_savefiles()
         self.history_index = len(self.history_files)
